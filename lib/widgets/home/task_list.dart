@@ -26,15 +26,16 @@ class _TaskListState extends State<TaskList> {
       children: [
         Expanded(
           child: StreamBuilder<QuerySnapshot>(
-            key: ValueKey(DateTime.now().millisecondsSinceEpoch),
+            // Se eliminó el key dinámico para evitar reinicializaciones constantes
             stream: widget.taskStream,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(
-                    child: CircularProgressIndicator(
-                  backgroundColor: AppColors.colorTwo,
-                  color: AppColors.colorOne,
-                ));
+                  child: CircularProgressIndicator(
+                    backgroundColor: AppColors.colorTwo,
+                    color: AppColors.colorOne,
+                  ),
+                );
               }
 
               if (snapshot.hasError) {
@@ -45,9 +46,11 @@ class _TaskListState extends State<TaskList> {
               final filteredTasks = tasks.where((doc) {
                 final task = doc.data() as Map<String, dynamic>;
                 bool statusMatch =
-                    filterProvider.selectedStatuses.isEmpty || filterProvider.selectedStatuses.contains(task['status']);
-                bool priorityMatch = filterProvider.selectedPriorities.isEmpty ||
-                    filterProvider.selectedPriorities.contains(task['priority']);
+                    filterProvider.selectedStatuses.isEmpty ||
+                        filterProvider.selectedStatuses.contains(task['status']);
+                bool priorityMatch =
+                    filterProvider.selectedPriorities.isEmpty ||
+                        filterProvider.selectedPriorities.contains(task['priority']);
                 return statusMatch && priorityMatch;
               }).toList();
 
@@ -64,9 +67,10 @@ class _TaskListState extends State<TaskList> {
                       Text(
                         "No hay tareas existentes",
                         style: TextStyle(
-                            fontSize: responsive.textExtraLarge,
-                            color: AppColors.colorThree.withOpacity(0.1),
-                            fontWeight: FontWeight.bold),
+                          fontSize: responsive.textExtraLarge,
+                          color: AppColors.colorThree.withOpacity(0.1),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 100),
                     ],
@@ -79,7 +83,6 @@ class _TaskListState extends State<TaskList> {
                 itemCount: filteredTasks.length,
                 itemBuilder: (context, index) {
                   final task = filteredTasks[index].data() as Map<String, dynamic>;
-
                   String formattedCreatedAt = _formatTimestamp(task['createdAt']);
                   String formattedDate = _formatTimestamp(task['date']);
 
@@ -89,12 +92,14 @@ class _TaskListState extends State<TaskList> {
                     description: task['description'],
                     status: task['status'],
                     priority: task['priority'],
-                    colorStatus: task['status'] == 'Completada' ? AppColors.colorTwo : AppColors.alertAmber,
+                    colorStatus: task['status'] == 'Completada'
+                        ? AppColors.colorTwo
+                        : AppColors.alertAmber,
                     colorPriority: task['priority'] == 'Alta'
                         ? AppColors.alertRed
                         : task['priority'] == 'Media'
-                            ? AppColors.alertAmber
-                            : AppColors.colorTwo,
+                        ? AppColors.alertAmber
+                        : AppColors.colorTwo,
                     createdAt: formattedCreatedAt,
                     taskDate: formattedDate,
                     taskId: filteredTasks[index].id,
